@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\lagrida_latex_editor.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\lagrida_latex_editor.png" />
+	</ItemGroup>
+
+</Project>
