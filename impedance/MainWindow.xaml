@@ -1,75 +1,111 @@
 ﻿<Window x:Class="impedance.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Калькулятор импеданса нагрузки" Height="900" Width="600"
+        Title="Импеданс нагрузки и коэффициент отражения" Height="700" Width="600"
         WindowStartupLocation="CenterScreen">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" MinHeight="35"/>
+            <RowDefinition Height="Auto" MinHeight="35"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" MinHeight="35"/>
+            <RowDefinition Height="Auto" MinHeight="35"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <!-- Title -->
+        <!-- Заголовок -->
         <TextBlock Grid.Row="0" Text="Расчёт импеданса нагрузки по формуле:" 
-                   FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" 
-                   Margin="0,0,0,15"/>
+                   FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" 
+                   Margin="0,0,0,10" Width="444" FontFamily="Times New Roman"/>
 
-        <!-- Formula Display -->
+        <!-- Формула -->
         <Border Grid.Row="1" BorderBrush="LightBlue" BorderThickness="1" 
-                Background="AliceBlue" Padding="10" Width="320" Margin="0,0,0,20">
+                Background="AliceBlue" Padding="10" Margin="120,0,120,20">
             <Image Source="/Resources/lagrida_latex_editor.png" Stretch="None" Height="89" VerticalAlignment="Center" HorizontalAlignment="Left" Width="538"/>
         </Border>
 
-        <!-- Wave Impedance (Z0) -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,5">
-            <TextBlock Text="Импеданс волны (Zв):" Width="150" VerticalAlignment="Center" FontSize="14"/>
-            <TextBox x:Name="txtWaveImpedance" Width="120" Height="25" 
-                     Text="50" HorizontalAlignment="Left"/>
-            <TextBlock Text="Ом" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
+        <!-- Импеданс волны(Z0) -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,5,0,5">
+            <TextBlock Text="Импеданс волны (Zв):" Width="175" VerticalAlignment="Center" FontSize="18" FontFamily="Times New Roman"/>
+            <TextBox x:Name="txtWaveImpedance" Width="100" Height="25" 
+                Text="50" FontFamily="Times New Roman" FontSize="18" RenderTransformOrigin="0.5,0.5"/>
+            <TextBlock TextWrapping="Wrap" Text="Ом" FontFamily="Times New Roman" FontSize="18" TextAlignment="Center" Width="35"/>
         </StackPanel>
 
-        <!-- K Parameter -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,5">
-            <TextBlock Text="Коэффициент К:" Width="150" VerticalAlignment="Center" FontSize="14"/>
-            <TextBox x:Name="txtK" Width="120" Height="25" 
-                     Text="1" HorizontalAlignment="Left"/>
+        <!-- Длина волны (λв) -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,5,0,5">
+            <TextBlock Text="Длина волны (λв):" Width="175" FontSize="18" RenderTransformOrigin="0.496,0.504" FontFamily="Times New Roman"/>
+            <TextBox x:Name="txtWaveLength" Width="100" Height="25" 
+                     Text="" HorizontalAlignment="Left" FontFamily="Times New Roman" FontSize="18"/>
+            <TextBlock TextWrapping="Wrap" Text="мм" TextAlignment="Center" FontFamily="Times New Roman" FontSize="18" Width="35"/>
         </StackPanel>
 
-        <!-- Wave Length -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,5">
-            <TextBlock Text="Длина волны (λ):" Width="150" VerticalAlignment="Center" FontSize="14"/>
-            <TextBox x:Name="txtWaveLength" Width="120" Height="25" 
-                     Text="1" HorizontalAlignment="Left"/>
-            <TextBlock Text="м" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
+        <!-- z0 min -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,5,0,5">
+            <TextBlock Text="z0 min:" Width="175" VerticalAlignment="Center" FontSize="18" FontFamily="Times New Roman"/>
+            <TextBox x:Name="txtZ0min" Width="100" Height="25" 
+                     Text="" HorizontalAlignment="Left" FontFamily="Times New Roman" FontSize="18"/>
+            <TextBlock TextWrapping="Wrap" Text="мм" FontFamily="Times New Roman" FontSize="18" Width="35" TextAlignment="Center"/>
         </StackPanel>
 
-        <!-- Zmin Parameter -->
-        <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0,5">
-            <TextBlock Text="ΔZmin:" Width="150" VerticalAlignment="Center" FontSize="14"/>
-            <TextBox x:Name="txtZmin" Width="120" Height="25" 
-                     Text="0,25" HorizontalAlignment="Left"/>
-            <TextBlock Text="м" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
+        <!-- Z min -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0,5,0,5">
+            <TextBlock Text="z min:" Width="175" VerticalAlignment="Center" FontSize="18" FontFamily="Times New Roman"/>
+            <TextBox x:Name="txtZmin" Width="100" Height="25" 
+                     Text="" HorizontalAlignment="Left" FontFamily="Times New Roman" FontSize="18"/>
+            <TextBlock TextWrapping="Wrap" Text="мм" FontFamily="Times New Roman" FontSize="18" Width="35" TextAlignment="Center"/>
         </StackPanel>
 
-        <!-- Calculate Button -->
-        <Button Grid.Row="6" x:Name="btnCalculate" Content="Посчитать" 
-                Width="180" Height="35" Margin="0,20,0,10" 
-                HorizontalAlignment="Center" Click="BtnCalculate_Click" FontSize="14"/>
+        <!-- z(Iд max) -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" Margin="0,5,0,5">
+            <TextBlock Text="z(Iд max):" VerticalAlignment="Center" Height="25" FontFamily="Times New Roman" FontSize="18" Width="175"/>
+            <TextBox x:Name="txtZImax" Width="100" Height="25" 
+             Text="" HorizontalAlignment="Left" FontFamily="Times New Roman" FontSize="18"/>
+            <TextBlock TextWrapping="Wrap" Text="мм" FontFamily="Times New Roman" FontSize="18" Width="35" TextAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Iд min -->
+
+        <!--
+        <StackPanel Grid.Row="8" Orientation="Horizontal" Margin="0,5,0,5">
+            <TextBlock Text="Iд min:" VerticalAlignment="Center" Height="25" FontFamily="Times New Roman" FontSize="18" Width="175"/>
+            <TextBox x:Name="txtImin" Width="100" Height="25" 
+             Text="" HorizontalAlignment="Left" FontFamily="Times New Roman" FontSize="18"/>
+            <TextBlock TextWrapping="Wrap" Text="мА" FontFamily="Times New Roman" FontSize="18" Width="35" TextAlignment="Center"/>
+        </StackPanel>
+        -->
+
+        <!-- z(Iд max) -->
+        <StackPanel Grid.Row="7" Orientation="Horizontal" Margin="0,5,0,5" Height="25">
+            <TextBlock Text="z(Iд min):" VerticalAlignment="Center" Height="25" FontFamily="Times New Roman" FontSize="18" Width="175"/>
+            <TextBox x:Name="txtZImin" Width="100" Height="25" 
+     Text="" HorizontalAlignment="Left" FontFamily="Times New Roman" FontSize="18"/>
+            <TextBlock TextWrapping="Wrap" Text="мм" FontFamily="Times New Roman" FontSize="18" Width="35" TextAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Кнопка Посчитать -->
+        <StackPanel Grid.Row="8" Margin="0,5,0,5">
+            <Button Content="Посчитать" Width="300" Click="BtnCalculate_Click" FontSize="18" Height="40" FontFamily="Times New Roman"/>
+        </StackPanel>
 
         <!-- Result Display -->
-        <Border Grid.Row="7" BorderBrush="LightGray" BorderThickness="1" 
-                Padding="15" Margin="0,10,0,0">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Border Grid.Row="9" BorderBrush="LightGray" BorderThickness="1" 
+                Padding="15" Margin="0,10,0,389">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
                 <TextBlock x:Name="txtResult" Text="Результаты..." 
-                           FontSize="14" TextWrapping="Wrap" FontFamily="Consolas"/>
+                           FontSize="18" TextWrapping="Wrap" FontFamily="Times New Roman"/>
             </ScrollViewer>
         </Border>
+
     </Grid>
 </Window>

@@ -16,17 +16,19 @@ namespace impedance
             try
             {
                 // Сбор введенных значений
-                double z0 = ParseDoubleInput(txtWaveImpedance.Text, "Волновой импеданс (Zв)");
-                double k = ParseDoubleInput(txtK.Text, "Коэффициент К");
-                double waveLength = ParseDoubleInput(txtWaveLength.Text, "Длина волны (λ)");
-                double zmin = ParseDoubleInput(txtZmin.Text, "ΔZmin");
+                double Zwave = ParseDoubleInput(txtWaveImpedance.Text, "Волновой импеданс (Zв)");
+                double waveLength = ParseDoubleInput(txtWaveLength.Text, "Длина волны (λв)");
+                double Z0min = ParseDoubleInput(txtZ0min.Text, "Z0min");
+                double Zmin = ParseDoubleInput(txtZmin.Text, "Zmin");
+                double ZImax = ParseDoubleInput(txtZImax.Text, "Z(Iд max)");
+                double ZImin = ParseDoubleInput(txtZImin.Text, "Z(Iд min)");
 
                 // Проверка ввода
                 if (waveLength <= 0)
                     throw new ArgumentException("Длина волны должна быть больше 0");
 
                 // Подсчет и отображение результатов
-                string result = CalculateLoadImpedance(z0, k, waveLength, zmin);
+                string result = CalculateLoadImpedance(Zwave, waveLength, Z0min, Zmin, ZImax, ZImin);
                 txtResult.Text = result;
             }
             catch (Exception ex)
@@ -50,50 +52,39 @@ namespace impedance
             return value;
         }
 
-        private string CalculateLoadImpedance(double z0, double k, double waveLength, double zmin)
+        private string CalculateLoadImpedance(double Zwave, double waveLength, double Z0min, double Zmin, double ZImax, double ZImin)
         {
             string result = "=== Расчёт импеданса нагрузки ===\n\n";
+            
 
-            // Отображение введенных параметров
-            result += "Введенные параметры:\n";
-            result += $"• Волновой импеданс (Zв): {z0} Ом\n";
-            result += $"• Коэффициент К: {k}\n";
-            result += $"• Длина волны (λ): {waveLength} м\n";
-            result += $"• ΔZmin: {zmin} м\n\n";
-
+            
             // Расчёт волнового числа β = 2π/λ
-            double beta = (2 * Math.PI) / waveLength;
-            result += "Промежуточные подсчеты:\n";
-            result += $"• Волновое число (β = 2π/λ): {beta:F6} рад/м\n";
+            double beta = 2 * Math.PI / waveLength;
 
-            // Расчёт β × ΔZmin
-            double betaZmin = beta * zmin;
-            result += $"• β × ΔZmin: {betaZmin:F6} рад\n";
+            // Расчёт КСВ
+            double Umax = Math.Abs(Math.Sin(beta * (ZImax - Z0min)));
+            double Umin = Math.Abs(Math.Sin(beta * (ZImin - Z0min)));
+            double K = Umax / Umin;
 
-            // Расчёт tan(β × Zmin)
-            double tgBetaZmin = Math.Tan(betaZmin);
-            result += $"• tg(β × ΔZmin): {tgBetaZmin:F6}\n\n";
+            // Расчёт ΔZmin
+            double deltaZmin = Z0min - Zmin;
 
-            // Расчёт с использованием комплексных чисел для точного определения импеданса
-            // Формула: Zн = Zв × (i + K×tg(β×ΔZmin)) / (iK + tg(β×ΔZmin))
+            // Тангенс из формулы
+            double tg = Math.Tan(beta * deltaZmin);
 
-            Complex numerator = new Complex(k * tgBetaZmin, 1);
-            Complex denominator = new Complex(tgBetaZmin, k);
+            // Расчёт с использованием комплексных чисел для определения импеданса
+            Complex numerator = new Complex(K * tg, 1);
+            Complex denuminator = new Complex(tg, K);
 
-            result += "Расчет комплексных чисел:\n";
-            result += $"• Числитель: (i + K×tg(β×ΔZmin)) = {FormatComplex(numerator)}\n";
-            result += $"• Знаменатель: (iK + tg(β×ΔZmin)) = {FormatComplex(denominator)}\n";
+            // Расчёт импеданса нагрузки(Zн)
+            Complex Zload = Zwave * (numerator / denuminator);
 
-            // Расчёт деления комплексных чисел
-            Complex ratio = numerator / denominator;
-            result += $"• Результат деления: {FormatComplex(ratio)}\n\n";
+            // Расчёт Коэффициента отражения(Гz)
+            Complex Гz = (Zload - Zwave) / (Zload + Zwave);
 
-            // Расчёт 
-            Complex zLoad = z0 * ratio;
-
-            result += "Финальный результат:\n"; 
-            result += $"• Импеданс нагрузки (Zн): {FormatComplex(zLoad)} Ом\n";
-
+            result += $"• Коэффициент Стоячей Волны (К): {K}\n";
+            result += $"• Импеданс нагрузки (Zн): {FormatComplex(Zload)} Ом\n";
+            result += $"• Коэффициент отражения(Гz): {FormatComplex(Гz)} \n";
 
             return result;
         }
@@ -106,11 +97,11 @@ namespace impedance
             }
             else if (Math.Abs(c.Real) < 1e-10)
             {
-                return c.Imaginary >= 0 ? $"j{c.Imaginary:F6}" : $"-j{Math.Abs(c.Imaginary):F6}";
+                return c.Imaginary >= 0 ? $"{c.Imaginary:F6}j" : $"-{Math.Abs(c.Imaginary):F6}j";
             }
             else
             {
-                string imagPart = c.Imaginary >= 0 ? $" + j{c.Imaginary:F6}" : $" - j{Math.Abs(c.Imaginary):F6}";
+                string imagPart = c.Imaginary >= 0 ? $" + {c.Imaginary:F6}j" : $" - {Math.Abs(c.Imaginary):F6}j";
                 return $"{c.Real:F6}{imagPart}";
             }
         }
